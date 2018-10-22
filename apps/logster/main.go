@@ -47,6 +47,27 @@ func process(logger zerolog.Logger) {
 	// TODO: load plugin
 }
 
+func initLogger() zerolog.Logger {
+	if opts.Debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	} else {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	}
+
+	if _, err := os.Stat(opts.LogDir); os.IsNotExist(err) {
+		err := os.Mkdir(opts.LogDir, 0755)
+		if err != nil {
+			panic(err)
+		}
+	}
+	logfileName := filepath.Join(opts.LogDir, "go-logster.log")
+	logFile, err := os.OpenFile(logfileName, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
+	if err != nil {
+		panic(err)
+	}
+	return zerolog.New(logFile).With().Timestamp().Logger()
+}
+
 func main() {
 	args := make([]string, len(os.Args)-1)
 	copy(args, os.Args[1:])
@@ -66,25 +87,7 @@ func main() {
 		return
 	}
 
-	if opts.Debug {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	} else {
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	}
-
-	if _, err := os.Stat(opts.LogDir); os.IsNotExist(err) {
-		err := os.Mkdir(opts.LogDir, 0755)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-	logfileName := filepath.Join(opts.LogDir, "go-logster.log")
-	logFile, err := os.OpenFile(logfileName, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
-	if err != nil {
-		panic(err)
-	}
-	logger := zerolog.New(logFile).With().Timestamp().Logger()
+	logger := initLogger()
 
 	process(logger)
 }

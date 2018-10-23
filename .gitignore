@@ -12,5 +12,6 @@
 *.out
 build
 
+run
 log
 *.log

@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"plugin"
+	"strings"
+	"time"
 
 	"github.com/amyangfei/go-logster/logster"
+	"github.com/gofrs/flock"
 	"github.com/jessevdk/go-flags"
 	"github.com/rs/zerolog"
 )
@@ -37,14 +41,78 @@ var opts struct {
 	} `positional-args:"yes" required:"yes" description:"parser plugin name and log file"`
 }
 
+func logErrorAndExit(logger zerolog.Logger, err error) {
+	logger.Error().Msg(err.Error())
+	os.Exit(1)
+}
+
 func process(logger zerolog.Logger) {
-	stateFile := filepath.Join(opts.StateDir, opts.ParseInfo.ParserPlugin, opts.ParseInfo.LogFile+".state")
-	lockFile := filepath.Join(opts.StateDir, opts.ParseInfo.ParserPlugin, opts.ParseInfo.LogFile+".lock")
+	baseName := strings.Replace(opts.ParseInfo.ParserPlugin+"-"+opts.ParseInfo.LogFile, "/", "-", -1)
+	stateFile := filepath.Join(opts.StateDir, baseName+".state")
+	lockFile := filepath.Join(opts.StateDir, baseName+".lock")
 
-	logger.Debug().Msg(fmt.Sprintf("State file %s, lock file %s", stateFile, lockFile))
-	logger.Info().Msg(fmt.Sprintf("Executing parser %s on logfile %s", opts.ParseInfo.ParserPlugin, opts.ParseInfo.LogFile))
+	logger.Debug().Msgf("State file %s, lock file %s", stateFile, lockFile)
+	logger.Info().Msgf("Executing parser %s on logfile %s", opts.ParseInfo.ParserPlugin, opts.ParseInfo.LogFile)
 
-	// TODO: load plugin
+	fileLock := flock.New(lockFile)
+	locked, err := fileLock.TryLock()
+
+	if err != nil {
+		logErrorAndExit(logger, err)
+	} else if !locked {
+		logErrorAndExit(logger, fmt.Errorf("Failed to acquire file lock"))
+	}
+	defer fileLock.Unlock()
+
+	tailer := logster.LogtailTailer{
+		Logfile:   opts.ParseInfo.LogFile,
+		Statefile: stateFile,
+		Binary:    logster.DefaultLogtailPath,
+	}
+	var duration time.Duration
+	info, err := os.Stat(stateFile)
+	if err != nil {
+		err2 := tailer.CreateStateFile()
+		if err2 != nil {
+			logErrorAndExit(logger, err2)
+		}
+		duration = time.Second
+	} else {
+		mtime := info.ModTime()
+		duration = time.Since(mtime)
+	}
+	logger.Debug().Msgf("Setting duration to %s seconds", duration)
+
+	plug, err := plugin.Open(opts.ParseInfo.ParserPlugin)
+	if err != nil {
+		logErrorAndExit(logger, err)
+	}
+	symParser, err := plug.Lookup("Parser")
+	if err != nil {
+		logErrorAndExit(logger, err)
+	}
+	parser, ok := symParser.(logster.Parser)
+	if !ok {
+		logErrorAndExit(logger, fmt.Errorf("unexpected type from module symbol"))
+	}
+	parser.Init(opts.Options)
+
+	c := make(chan string)
+	go tailer.ReadLines(c)
+	for line := range c {
+		parser.ParseLine(line)
+	}
+
+	if metrics, err := parser.GetState(duration.Seconds()); err != nil {
+		logErrorAndExit(logger, err)
+	} else {
+		//for _, output := range opts.Output {
+		//}
+		for _, metric := range metrics {
+			fmt.Printf("Name: %s Value: %f\n", metric.Name, metric.Value)
+		}
+
+	}
 }
 
 func initLogger() zerolog.Logger {

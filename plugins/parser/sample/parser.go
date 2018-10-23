@@ -56,15 +56,16 @@ func (parser *SampleParser) ParseLine(line string) error {
 	return nil
 }
 
-func (parser *SampleParser) GetState(duration int) ([]*logster.Metric, error) {
-	fd := float64(duration)
+func (parser *SampleParser) GetState(duration float64) ([]*logster.Metric, error) {
 	units := "Responses per sec"
 	return []*logster.Metric{
-		&logster.Metric{Name: "http_1xx", Value: float64(parser.http1xx) / fd, Units: units},
-		&logster.Metric{Name: "http_2xx", Value: float64(parser.http2xx) / fd, Units: units},
-		&logster.Metric{Name: "http_3xx", Value: float64(parser.http3xx) / fd, Units: units},
-		&logster.Metric{Name: "http_4xx", Value: float64(parser.http4xx) / fd, Units: units},
-		&logster.Metric{Name: "http_5xx", Value: float64(parser.http5xx) / fd, Units: units},
-		&logster.Metric{Name: "http_unknown", Value: float64(parser.httpUnknown) / fd, Units: units},
+		&logster.Metric{Name: "http_1xx", Value: float64(parser.http1xx) / duration, Units: units},
+		&logster.Metric{Name: "http_2xx", Value: float64(parser.http2xx) / duration, Units: units},
+		&logster.Metric{Name: "http_3xx", Value: float64(parser.http3xx) / duration, Units: units},
+		&logster.Metric{Name: "http_4xx", Value: float64(parser.http4xx) / duration, Units: units},
+		&logster.Metric{Name: "http_5xx", Value: float64(parser.http5xx) / duration, Units: units},
+		&logster.Metric{Name: "http_unknown", Value: float64(parser.httpUnknown) / duration, Units: units},
 	}, nil
 }
+
+var Parser SampleParser

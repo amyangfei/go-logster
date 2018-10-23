@@ -3,7 +3,7 @@ package logster
 type Parser interface {
 	Init(options string) error
 	ParseLine(line string) error
-	GetState(duration int) ([]*Metric, error)
+	GetState(duration float64) ([]*Metric, error)
 }
 
 type Metric struct {

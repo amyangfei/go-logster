@@ -36,4 +36,6 @@ func (output *StdoutOutput) Submit(metrics []*logster.Metric) error {
 	return nil
 }
 
+func main() {}
+
 var Output StdoutOutput

@@ -70,4 +70,6 @@ func (parser *SampleParser) GetState(duration float64) ([]*logster.Metric, error
 	}, nil
 }
 
+func main() {}
+
 var Parser SampleParser

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"plugin"
 	"strings"
 	"time"
 
@@ -48,38 +47,6 @@ func logErrorAndExit(logger zerolog.Logger, err error) {
 	os.Exit(1)
 }
 
-func loadParserPlugin(pluginPath string) (logster.Parser, error) {
-	plug, err := plugin.Open(pluginPath)
-	if err != nil {
-		return nil, err
-	}
-	symbol, err := plug.Lookup("Parser")
-	if err != nil {
-		return nil, err
-	}
-	parser, ok := symbol.(logster.Parser)
-	if !ok {
-		return nil, fmt.Errorf("unexpected type from module symbol")
-	}
-	return parser, nil
-}
-
-func loadOutputPlugin(pluginPath string) (logster.Output, error) {
-	plug, err := plugin.Open(pluginPath)
-	if err != nil {
-		return nil, err
-	}
-	symbol, err := plug.Lookup("Output")
-	if err != nil {
-		return nil, err
-	}
-	output, ok := symbol.(logster.Output)
-	if !ok {
-		return nil, fmt.Errorf("unexpected type from module symbol")
-	}
-	return output, nil
-}
-
 func process(logger zerolog.Logger) {
 	baseName := strings.Replace(opts.ParseInfo.ParserPlugin+"-"+opts.ParseInfo.LogFile, "/", "-", -1)
 	stateFile := filepath.Join(opts.StateDir, baseName+".state")
@@ -117,7 +84,7 @@ func process(logger zerolog.Logger) {
 	}
 	logger.Debug().Msgf("Setting duration to %s seconds", duration)
 
-	parser, err := loadParserPlugin(opts.ParseInfo.ParserPlugin)
+	parser, err := logster.LoadParserPlugin(opts.ParseInfo.ParserPlugin)
 	if err != nil {
 		logErrorAndExit(logger, err)
 	}
@@ -133,7 +100,7 @@ func process(logger zerolog.Logger) {
 		logErrorAndExit(logger, err)
 	} else {
 		for _, pluginPath := range opts.Output {
-			output, err := loadOutputPlugin(pluginPath)
+			output, err := logster.LoadOutputPlugin(pluginPath)
 			if err != nil {
 				logErrorAndExit(logger, err)
 			}

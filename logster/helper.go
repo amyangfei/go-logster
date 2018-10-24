@@ -1,5 +1,10 @@
 package logster
 
+import (
+	"errors"
+	"plugin"
+)
+
 type Parser interface {
 	Init(options string) error
 	ParseLine(line string) error
@@ -34,4 +39,36 @@ func (op *MetricOp) GetMetricName(metric *Metric) string {
 		metricName = metricName + op.Separator + op.Suffix
 	}
 	return metricName
+}
+
+func LoadParserPlugin(pluginPath string) (Parser, error) {
+	plug, err := plugin.Open(pluginPath)
+	if err != nil {
+		return nil, err
+	}
+	symbol, err := plug.Lookup("Parser")
+	if err != nil {
+		return nil, err
+	}
+	parser, ok := symbol.(Parser)
+	if !ok {
+		return nil, errors.New("unexpected type from module symbol")
+	}
+	return parser, nil
+}
+
+func LoadOutputPlugin(pluginPath string) (Output, error) {
+	plug, err := plugin.Open(pluginPath)
+	if err != nil {
+		return nil, err
+	}
+	symbol, err := plug.Lookup("Output")
+	if err != nil {
+		return nil, err
+	}
+	output, ok := symbol.(Output)
+	if !ok {
+		return nil, errors.New("unexpected type from module symbol")
+	}
+	return output, nil
 }

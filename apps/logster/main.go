@@ -33,7 +33,9 @@ var opts struct {
 
 	Debug bool `long:"debug" short:"D" description:"Provide more verbose logging for debugging."`
 
-	Options string `long:"options" short:"O" description:"specific output options"`
+	ParserOptions string `long:"parser-options" short:"P" description:"specific parser options"`
+
+	OutputOptions string `long:"output-options" short:"O" description:"specific output options"`
 
 	ParseInfo struct {
 		ParserPlugin string
@@ -44,6 +46,38 @@ var opts struct {
 func logErrorAndExit(logger zerolog.Logger, err error) {
 	logger.Error().Msg(err.Error())
 	os.Exit(1)
+}
+
+func loadParserPlugin(pluginPath string) (logster.Parser, error) {
+	plug, err := plugin.Open(pluginPath)
+	if err != nil {
+		return nil, err
+	}
+	symbol, err := plug.Lookup("Parser")
+	if err != nil {
+		return nil, err
+	}
+	parser, ok := symbol.(logster.Parser)
+	if !ok {
+		return nil, fmt.Errorf("unexpected type from module symbol")
+	}
+	return parser, nil
+}
+
+func loadOutputPlugin(pluginPath string) (logster.Output, error) {
+	plug, err := plugin.Open(pluginPath)
+	if err != nil {
+		return nil, err
+	}
+	symbol, err := plug.Lookup("Output")
+	if err != nil {
+		return nil, err
+	}
+	output, ok := symbol.(logster.Output)
+	if !ok {
+		return nil, fmt.Errorf("unexpected type from module symbol")
+	}
+	return output, nil
 }
 
 func process(logger zerolog.Logger) {
@@ -83,19 +117,11 @@ func process(logger zerolog.Logger) {
 	}
 	logger.Debug().Msgf("Setting duration to %s seconds", duration)
 
-	plug, err := plugin.Open(opts.ParseInfo.ParserPlugin)
+	parser, err := loadParserPlugin(opts.ParseInfo.ParserPlugin)
 	if err != nil {
 		logErrorAndExit(logger, err)
 	}
-	symParser, err := plug.Lookup("Parser")
-	if err != nil {
-		logErrorAndExit(logger, err)
-	}
-	parser, ok := symParser.(logster.Parser)
-	if !ok {
-		logErrorAndExit(logger, fmt.Errorf("unexpected type from module symbol"))
-	}
-	parser.Init(opts.Options)
+	parser.Init(opts.ParserOptions)
 
 	c := make(chan string)
 	go tailer.ReadLines(c)
@@ -106,12 +132,14 @@ func process(logger zerolog.Logger) {
 	if metrics, err := parser.GetState(duration.Seconds()); err != nil {
 		logErrorAndExit(logger, err)
 	} else {
-		//for _, output := range opts.Output {
-		//}
-		for _, metric := range metrics {
-			fmt.Printf("Name: %s Value: %f\n", metric.Name, metric.Value)
+		for _, pluginPath := range opts.Output {
+			output, err := loadOutputPlugin(pluginPath)
+			if err != nil {
+				logErrorAndExit(logger, err)
+			}
+			output.Init(opts.MetricPrefix, opts.MetricSuffix, opts.OutputOptions)
+			output.Submit(metrics)
 		}
-
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/amyangfei/go-logster/logster"
 )
@@ -58,13 +59,14 @@ func (parser *SampleParser) ParseLine(line string) error {
 
 func (parser *SampleParser) GetState(duration float64) ([]*logster.Metric, error) {
 	units := "Responses per sec"
+	now := time.Now().Unix()
 	return []*logster.Metric{
-		&logster.Metric{Name: "http_1xx", Value: float64(parser.http1xx) / duration, Units: units},
-		&logster.Metric{Name: "http_2xx", Value: float64(parser.http2xx) / duration, Units: units},
-		&logster.Metric{Name: "http_3xx", Value: float64(parser.http3xx) / duration, Units: units},
-		&logster.Metric{Name: "http_4xx", Value: float64(parser.http4xx) / duration, Units: units},
-		&logster.Metric{Name: "http_5xx", Value: float64(parser.http5xx) / duration, Units: units},
-		&logster.Metric{Name: "http_unknown", Value: float64(parser.httpUnknown) / duration, Units: units},
+		&logster.Metric{Name: "http_1xx", Value: float64(parser.http1xx) / duration, Units: units, Timestamp: now},
+		&logster.Metric{Name: "http_2xx", Value: float64(parser.http2xx) / duration, Units: units, Timestamp: now},
+		&logster.Metric{Name: "http_3xx", Value: float64(parser.http3xx) / duration, Units: units, Timestamp: now},
+		&logster.Metric{Name: "http_4xx", Value: float64(parser.http4xx) / duration, Units: units, Timestamp: now},
+		&logster.Metric{Name: "http_5xx", Value: float64(parser.http5xx) / duration, Units: units, Timestamp: now},
+		&logster.Metric{Name: "http_unknown", Value: float64(parser.httpUnknown) / duration, Units: units, Timestamp: now},
 	}, nil
 }
 

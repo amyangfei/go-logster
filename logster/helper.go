@@ -12,11 +12,10 @@ type Parser interface {
 }
 
 type Metric struct {
-	Name       string
-	Value      float64
-	Units      string
-	Timestamp  int64
-	MetricType string
+	Name      string
+	Value     interface{}
+	Units     string
+	Timestamp int64
 }
 
 type Output interface {

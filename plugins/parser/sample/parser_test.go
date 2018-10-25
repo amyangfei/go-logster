@@ -61,7 +61,7 @@ func TestMetrics2Sec(t *testing.T) {
 	preParseLog(p)
 	metrics, err := p.GetState(2)
 	assert.Nil(t, err)
-	expected := map[string]float64{
+	expected := map[string]interface{}{
 		"http_1xx":     0,
 		"http_2xx":     1,
 		"http_3xx":     0,
@@ -71,7 +71,7 @@ func TestMetrics2Sec(t *testing.T) {
 	}
 	for _, metric := range metrics {
 		assert.Contains(t, expected, metric.Name)
-		assert.Equal(t, expected[metric.Name], metric.Value)
+		assert.EqualValues(t, expected[metric.Name], metric.Value)
 	}
 }
 

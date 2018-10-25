@@ -31,7 +31,7 @@ func (output *StdoutOutput) Init(prefix, suffix, options string) error {
 func (output *StdoutOutput) Submit(metrics []*logster.Metric) error {
 	for _, metric := range metrics {
 		metricName := output.MetricOp.GetMetricName(metric)
-		fmt.Printf("%d %s %f\n", metric.Timestamp, metricName, metric.Value)
+		fmt.Printf("%d %s %v\n", metric.Timestamp, metricName, metric.Value)
 	}
 	return nil
 }

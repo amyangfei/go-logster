@@ -19,6 +19,12 @@
   version = "v0.7.0"
 
 [[projects]]
+  name = "github.com/imdario/mergo"
+  packages = ["."]
+  revision = "9f23e2d6bd2a77f959b2bf6acdbefd708a83a4a4"
+  version = "v0.3.6"
+
+[[projects]]
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
   revision = "c6ca198ec95c841fdb89fc0de7496fed11ab854e"
@@ -49,6 +55,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e6f6203137d15d22d2d37eb93d0d96b70d86568ec2638cd154a70b7865157d4e"
+  inputs-digest = "9d514f7097b0163b385ee9720c08b76c3552950fbdd72868bf18b5ab04a45245"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -16,10 +16,11 @@ type StdoutOutput struct {
 func (output *StdoutOutput) Init(prefix, suffix, options string) error {
 	val, dataType, _, err := jsonparser.Get([]byte(options), "separator")
 	if err != nil {
-		return err
-	}
-	if dataType == jsonparser.NotExist {
-		output.MetricOp.Separator = DefaultSeparator
+		if dataType == jsonparser.NotExist {
+			output.MetricOp.Separator = DefaultSeparator
+		} else {
+			return err
+		}
 	} else {
 		output.MetricOp.Separator = string(val)
 	}

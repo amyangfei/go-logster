@@ -21,15 +21,14 @@ type JsonParser struct {
 func parserKey(options, key, defaultVal string) (string, error) {
 	val, dataType, _, err := jsonparser.Get([]byte(options), key)
 	if err != nil {
-		return "", err
-	}
-	var result string
-	if dataType == jsonparser.NotExist {
-		result = defaultVal
+		if dataType == jsonparser.NotExist {
+			return defaultVal, nil
+		} else {
+			return "", err
+		}
 	} else {
-		result = string(val)
+		return string(val), nil
 	}
-	return result, nil
 }
 
 func (parser *JsonParser) Init(options string) error {

@@ -21,15 +21,7 @@ fi
 
 
 echo "Build test..."
-for dir in apps/*/; do
-    dir=${dir%/}
-    if grep -q '^package main$' $dir/*.go 2>/dev/null; then
-        echo "building $dir"
-        go build -o $dir/$(basename $dir) ./$dir
-    else
-        echo "(skipped $dir)"
-    fi
-done
+make clean && make
 
 
 echo "Success"

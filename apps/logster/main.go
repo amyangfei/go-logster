@@ -104,8 +104,13 @@ func process(logger zerolog.Logger) {
 			if err != nil {
 				logErrorAndExit(logger, err)
 			}
-			output.Init(opts.MetricPrefix, opts.MetricSuffix, opts.OutputOptions)
-			output.Submit(metrics)
+			if err := output.Init(opts.MetricPrefix, opts.MetricSuffix,
+				opts.OutputOptions, opts.DryRun, logger); err != nil {
+				logErrorAndExit(logger, err)
+			}
+			if err := output.Submit(metrics); err != nil {
+				logErrorAndExit(logger, err)
+			}
 		}
 	}
 }

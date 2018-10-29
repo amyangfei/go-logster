@@ -5,6 +5,7 @@ import (
 
 	"github.com/amyangfei/go-logster/logster"
 	"github.com/buger/jsonparser"
+	"github.com/rs/zerolog"
 )
 
 const DefaultSeparator = "."
@@ -13,7 +14,8 @@ type StdoutOutput struct {
 	logster.MetricOp
 }
 
-func (output *StdoutOutput) Init(prefix, suffix, options string) error {
+func (output *StdoutOutput) Init(
+	prefix, suffix, options string, dryRun bool, logger zerolog.Logger) error {
 	val, dataType, _, err := jsonparser.Get([]byte(options), "separator")
 	if err != nil {
 		if dataType == jsonparser.NotExist {

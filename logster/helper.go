@@ -3,6 +3,8 @@ package logster
 import (
 	"errors"
 	"plugin"
+
+	"github.com/rs/zerolog"
 )
 
 type Parser interface {
@@ -19,7 +21,7 @@ type Metric struct {
 }
 
 type Output interface {
-	Init(prefix, suffix, options string) error
+	Init(prefix, suffix, options string, dryRun bool, logger zerolog.Logger) error
 	Submit(metrics []*Metric) error
 }
 

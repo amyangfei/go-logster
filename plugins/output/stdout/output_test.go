@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/amyangfei/go-logster/logster"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,9 +49,15 @@ func prepareData() []TestData {
 	return inputData
 }
 
+var Logger zerolog.Logger
+
+func init() {
+	Logger = zerolog.New(os.Stdout)
+}
+
 func TestStdoutOutput(t *testing.T) {
 	output := &StdoutOutput{}
-	err := output.Init("P", "S", `{"separator": "-"}`)
+	err := output.Init("P", "S", `{"separator": "-"}`, false, Logger)
 	assert.Nil(t, err)
 
 	inputData := prepareData()
@@ -67,7 +74,7 @@ func TestStdoutOutput(t *testing.T) {
 
 func TestStdoutWithNoOption(t *testing.T) {
 	output := &StdoutOutput{}
-	err := output.Init("P", "", "")
+	err := output.Init("P", "", "", false, Logger)
 	assert.Nil(t, err)
 	inputData := prepareData()
 	metrics := []*logster.Metric{}

@@ -10,6 +10,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
+const DefaultSeparator = "."
+
 type GraphiteOutput struct {
 	logster.MetricOp
 	Host     string
@@ -40,10 +42,19 @@ func (output *GraphiteOutput) Init(
 	if err != nil {
 		return err
 	}
+
+	separator, err := parserKey(options, "separator", DefaultSeparator)
+	if err != nil {
+		return err
+	}
+
 	output.Host = host
 	output.Prototol = protocol
 	output.DryRun = dryRun
 	output.Logger = logger
+	output.MetricOp.Separator = separator
+	output.MetricOp.Prefix = prefix
+	output.MetricOp.Suffix = suffix
 	return nil
 }
 

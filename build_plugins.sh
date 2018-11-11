@@ -8,7 +8,7 @@ function build_plugin() {
     for dir in $(find plugins/$plugin_type -mindepth 1 -type d); do
         name=${dir##*"/"}
         src=$(ls $dir/*.go|grep -v .*_test.go)
-        cmd="go build -buildmode=plugin -o $BUILD_DIR/${name}_${plugin_type}.so $src"
+        cmd="GO111MODULE=on go build -buildmode=plugin -o $BUILD_DIR/${name}_${plugin_type}.so $src"
         echo $cmd
         eval $cmd
     done

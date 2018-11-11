@@ -12,7 +12,7 @@ $(BUILDDIR)/logster: $(wildcard apps/logster/*.go logster/*.go)
 
 $(BUILDDIR)/%:
 	@mkdir -p $(dir $@)
-	go build ${GOFLAGS} -o $@ ./apps/$*
+	GO111MODULE=on go build ${GOFLAGS} -o $@ ./apps/$*
 	@bash ./build_plugins.sh
 
 $(APPS): %: $(BUILDDIR)/%

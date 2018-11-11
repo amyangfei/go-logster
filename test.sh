@@ -8,7 +8,7 @@ FMT="logster apps/logster plugins/output/stdout plugins/parser/sample"
 
 
 echo "Running tests..."
-go test -v $(go list ./... | grep -v /vendor/)
+GO111MODULE=on go test -v $(go list ./...)
 
 
 echo "Checking gofmt..."

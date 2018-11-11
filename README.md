@@ -14,7 +14,7 @@ As golang is a static programming language, we can't use dynamic parser/output c
 
 Two parser plugin samples and two output plugin samples are provided in this project. A parser plugin must implement the `Parser` interface defined in `logster/helper.go` and export an XXParser variable named `Parser`. An output plugin must implement the `Output` interface defined in `logster/helper.go` and export an XXOutput variable named `Output`.
 
-When you finish your parser/output plugin and put the code to right dir, just use `make` to build `logster` binary and plugin shared object library.
+When you finish your parser/output plugin and put the code to right dir, just use `make` to build `logster` binary and plugin shared object library. The version of Go must be 1.11 or above.
 
 You can test go-logster from the command line. The --dry-run option will allow you to see the metrics being generated on stdout rather than sending them to your configured output. Besides you should provide the path of so file of parser/output plugin. For example:
 

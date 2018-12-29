@@ -2,26 +2,26 @@
 #
 # Run all tests
 
-cur=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-FMT="logster apps/logster plugins/output/stdout plugins/parser/sample"
-
+PACKAGES=$(go list ./... | grep -vE 'vendor|examples')
+FILES=$(find . -name "*.go" | grep -vE "vendor|examples")
 
 echo "Running tests..."
-GO111MODULE=on go test -v $(go list ./...)
-
+GO111MODULE=on go test -v -cover ${PACKAGES}
 
 echo "Checking gofmt..."
-cd $cur
-fmtRes=$(gofmt -l $FMT)
-if [ -n "${fmtRes}" ]; then
-    echo -e "gofmt checking failed:\n${fmtRes}"
-    exit 255
-fi
+gofmt -s -l -w ${FILES} 2>&1 | awk '{print} END{if(NR>0) {exit 1}}'
 
+echo "Checking govet..."
+go vet -all ${PACKAGES} 2>&1 | awk '{print} END{if(NR>0) {exit 1}}'
 
-echo "Build test..."
-make clean && make
+# GO111MODULE=off go get github.com/kisielk/errcheck
+# echo "errcheck"
+# errcheck -blank ${PACKAGES} | grep -v "_test\.go" | awk '{print} END{if(NR>0) {exit 1}}'
 
+GO111MODULE=off go get golang.org/x/lint/golint
+echo "Checking golint..."
+golint -set_exit_status ${PACKAGES}
 
 echo "Success"
+

@@ -6,8 +6,12 @@ env:
   - GOARCH=amd64
 
 sudo: false
+
 go_import_path: github.com/amyangfei/go-logster
+
 before_install:
   - go get github.com/mattn/goveralls
+
 script:
   - ./test.sh
+  - $GOPATH/bin/goveralls -service=travis-ci

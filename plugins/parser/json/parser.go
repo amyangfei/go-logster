@@ -35,7 +35,7 @@ func parserKey(options, key, defaultVal string) (string, error) {
 
 // Init inits the *JSONParser type Parser
 func (parser *JSONParser) Init(options string) error {
-	val, err := parserKey(options, "seperator", DefaultKeySeparator)
+	val, err := parserKey(options, "separator", DefaultKeySeparator)
 	if err != nil {
 		return err
 	}

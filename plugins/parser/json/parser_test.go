@@ -13,7 +13,7 @@ func getJSONParser(options string) *JSONParser {
 }
 
 func TestValidJson(t *testing.T) {
-	p := getJSONParser(`{"seperator": "$", "prefix": "T"}`)
+	p := getJSONParser(`{"separator": "$", "prefix": "T"}`)
 
 	line := `{"1.1":
 				{"value1": 0,
@@ -42,7 +42,7 @@ func TestValidJson(t *testing.T) {
 }
 
 func TestJsonMerge(t *testing.T) {
-	p := getJSONParser(`{"seperator": "."}`)
+	p := getJSONParser(`{"separator": "."}`)
 
 	lines := []string{
 		`{"1.1": {

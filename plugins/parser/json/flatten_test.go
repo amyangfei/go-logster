@@ -13,7 +13,7 @@ func TestFlatten(t *testing.T) {
 		test      string
 		want      map[string]interface{}
 		prefix    string
-		seperator string
+		separator string
 	}{
 		{
 			`{
@@ -65,7 +65,7 @@ func TestFlatten(t *testing.T) {
 		if err != nil {
 			t.Errorf("%d: failed to unmarshal test: %v", i+1, err)
 		}
-		got, err := Flatten(m.(map[string]interface{}), test.prefix, test.seperator)
+		got, err := Flatten(m.(map[string]interface{}), test.prefix, test.separator)
 		if err != nil {
 			t.Errorf("%d: failed to flatten: %v", i+1, err)
 		}
@@ -80,7 +80,7 @@ func TestFlattenString(t *testing.T) {
 		test      string
 		want      string
 		prefix    string
-		seperator string
+		separator string
 	}{
 		{
 			`{ "a": "b" }`,
@@ -97,7 +97,7 @@ func TestFlattenString(t *testing.T) {
 	}
 
 	for i, test := range cases {
-		got, err := FlattenString(test.test, test.prefix, test.seperator)
+		got, err := FlattenString(test.test, test.prefix, test.separator)
 		if err != nil {
 			t.Errorf("%d: failed to flatten: %v", i+1, err)
 		}

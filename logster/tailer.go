@@ -59,8 +59,5 @@ func (tailer *LogtailTailer) ReadLines(c chan string) error {
 		c <- scanner.Text()
 	}
 	defer close(c)
-	if err := cmd.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return cmd.Wait()
 }

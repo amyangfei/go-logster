@@ -1,6 +1,8 @@
 # Logster implemented by golang
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/amyangfei/go-logster)](https://goreportcard.com/report/github.com/amyangfei/go-logster)
 [![Build Status](https://travis-ci.org/amyangfei/go-logster.svg?branch=master)](https://travis-ci.org/amyangfei/go-logster)
+[![Coverage Status](https://coveralls.io/repos/github/amyangfei/go-logster/badge.svg?branch=master)](https://coveralls.io/github/amyangfei/go-logster?branch=master)
 
 This is a golang implemention of [logster](https://github.com/etsy/logster)
 

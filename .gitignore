@@ -15,3 +15,4 @@ build
 run
 log
 *.log
+vendor

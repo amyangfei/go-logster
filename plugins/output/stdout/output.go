@@ -8,12 +8,15 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// DefaultSeparator is separator used in metric operation
 const DefaultSeparator = "."
 
+// StdoutOutput sends metrics to stdout
 type StdoutOutput struct {
 	logster.MetricOp
 }
 
+// Init inits the *StdoutOutput type Output
 func (output *StdoutOutput) Init(
 	prefix, suffix, options string, dryRun bool, logger zerolog.Logger) error {
 	val, dataType, _, err := jsonparser.Get([]byte(options), "separator")
@@ -31,6 +34,7 @@ func (output *StdoutOutput) Init(
 	return nil
 }
 
+// Submit send metrics to stdout
 func (output *StdoutOutput) Submit(metrics []*logster.Metric) error {
 	for _, metric := range metrics {
 		metricName := output.MetricOp.GetMetricName(metric)
@@ -41,4 +45,5 @@ func (output *StdoutOutput) Submit(metrics []*logster.Metric) error {
 
 func main() {}
 
+// Output declares a StdoutOutput object
 var Output StdoutOutput

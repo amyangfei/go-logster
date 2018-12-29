@@ -10,8 +10,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// DefaultSeparator is separator used in metric operation
 const DefaultSeparator = "."
 
+// GraphiteOutput sends metric to graphite
 type GraphiteOutput struct {
 	logster.MetricOp
 	Host     string
@@ -27,11 +29,11 @@ func parserKey(options, key, defaultVal string) (string, error) {
 			return defaultVal, nil
 		}
 		return "", err
-	} else {
-		return string(val), nil
 	}
+	return string(val), nil
 }
 
+// Init inits the *GraphiteOutput type Output
 func (output *GraphiteOutput) Init(
 	prefix, suffix, options string, dryRun bool, logger zerolog.Logger) error {
 	host, err := parserKey(options, "host", "")
@@ -58,6 +60,7 @@ func (output *GraphiteOutput) Init(
 	return nil
 }
 
+// Submit sends metrics to graphite
 func (output *GraphiteOutput) Submit(metrics []*logster.Metric) error {
 	var conn net.Conn
 	var err error
@@ -86,4 +89,5 @@ func (output *GraphiteOutput) Submit(metrics []*logster.Metric) error {
 
 func main() {}
 
+// Output declares an GraphiteOutput object
 var Output GraphiteOutput

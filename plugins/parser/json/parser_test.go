@@ -6,14 +6,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func getJsonParser(options string) *JsonParser {
-	p := &JsonParser{}
+func getJSONParser(options string) *JSONParser {
+	p := &JSONParser{}
 	p.Init(options)
 	return p
 }
 
 func TestValidJson(t *testing.T) {
-	p := getJsonParser(`{"seperator": "$", "prefix": "T"}`)
+	p := getJSONParser(`{"seperator": "$", "prefix": "T"}`)
 
 	line := `{"1.1":
 				{"value1": 0,
@@ -42,7 +42,7 @@ func TestValidJson(t *testing.T) {
 }
 
 func TestJsonMerge(t *testing.T) {
-	p := getJsonParser(`{"seperator": "."}`)
+	p := getJSONParser(`{"seperator": "."}`)
 
 	lines := []string{
 		`{"1.1": {
@@ -87,7 +87,7 @@ func TestJsonMerge(t *testing.T) {
 }
 
 func TestInvalidJson(t *testing.T) {
-	p := getJsonParser("")
+	p := getJSONParser("")
 	err := p.ParseLine(`{"hello": "world"`)
 	assert.NotNil(t, err)
 }

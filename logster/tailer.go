@@ -9,8 +9,10 @@ import (
 	"os/exec"
 )
 
+// DefaultLogtailPath is the default path to logtail2 binary
 const DefaultLogtailPath = "/usr/sbin/logtail2"
 
+// LogtailTailer holds running parameters of logtail2
 type LogtailTailer struct {
 	Binary    string
 	Logfile   string
@@ -21,6 +23,7 @@ func (tailer *LogtailTailer) cmd() []string {
 	return []string{"-f", tailer.Logfile, "-o", tailer.Statefile}
 }
 
+// CreateStateFile creates the state file of LogtailTailer
 func (tailer *LogtailTailer) CreateStateFile() error {
 	cmd := exec.Command(tailer.Binary, tailer.cmd()...)
 
@@ -43,6 +46,7 @@ func (tailer *LogtailTailer) CreateStateFile() error {
 	return nil
 }
 
+// ReadLines reads lines via logtail and sends data to the given chan line by line
 func (tailer *LogtailTailer) ReadLines(c chan string) error {
 	cmd := exec.Command(tailer.Binary, tailer.cmd()...)
 

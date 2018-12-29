@@ -9,10 +9,14 @@ import (
 	"github.com/imdario/mergo"
 )
 
+// DefaultKeySeparator is separator used in combined json key
 const DefaultKeySeparator = "."
+
+// DefaultPrefix is prefix added to json key
 const DefaultPrefix = ""
 
-type JsonParser struct {
+// JSONParser holds a json parser
+type JSONParser struct {
 	KeySeparator string
 	Prefix       string
 	Metrics      map[string]interface{}
@@ -23,30 +27,32 @@ func parserKey(options, key, defaultVal string) (string, error) {
 	if err != nil {
 		if dataType == jsonparser.NotExist {
 			return defaultVal, nil
-		} else {
-			return "", err
 		}
-	} else {
-		return string(val), nil
+		return "", err
 	}
+	return string(val), nil
 }
 
-func (parser *JsonParser) Init(options string) error {
-	if val, err := parserKey(options, "seperator", DefaultKeySeparator); err != nil {
+// Init inits the *JSONParser type Parser
+func (parser *JSONParser) Init(options string) error {
+	val, err := parserKey(options, "seperator", DefaultKeySeparator)
+	if err != nil {
 		return err
-	} else {
-		parser.KeySeparator = val
 	}
-	if val, err := parserKey(options, "prefix", DefaultPrefix); err != nil {
+	parser.KeySeparator = val
+
+	val, err = parserKey(options, "prefix", DefaultPrefix)
+	if err != nil {
 		return err
-	} else {
-		parser.Prefix = val
 	}
+	parser.Prefix = val
+
 	parser.Metrics = make(map[string]interface{})
 	return nil
 }
 
-func (parser *JsonParser) ParseLine(line string) error {
+// ParseLine parses online and caches the parsed result
+func (parser *JSONParser) ParseLine(line string) error {
 	var nested map[string]interface{}
 	if err := json.Unmarshal([]byte(line), &nested); err != nil {
 		return err
@@ -55,7 +61,8 @@ func (parser *JsonParser) ParseLine(line string) error {
 	return nil
 }
 
-func (parser *JsonParser) GetState(duration float64) ([]*logster.Metric, error) {
+// GetState gets flatten json metrics from cached parsed result
+func (parser *JSONParser) GetState(duration float64) ([]*logster.Metric, error) {
 	flatmap, err := Flatten(parser.Metrics, parser.Prefix, parser.KeySeparator)
 	if err != nil {
 		return nil, err
@@ -70,4 +77,5 @@ func (parser *JsonParser) GetState(duration float64) ([]*logster.Metric, error) 
 
 func main() {}
 
-var Parser JsonParser
+// Parser declares a JSONParser object
+var Parser JSONParser

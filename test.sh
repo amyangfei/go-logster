@@ -13,7 +13,7 @@ echo "Checking gofmt..."
 gofmt -s -l -w ${FILES} 2>&1 | awk '{print} END{if(NR>0) {exit 1}}'
 
 echo "Checking govet..."
-go vet -all ${PACKAGES} 2>&1 | awk '{print} END{if(NR>0) {exit 1}}'
+GO111MODULE=on go vet -all ${PACKAGES} 2>&1 | awk '{print} END{if(NR>0) {exit 1}}'
 
 # GO111MODULE=off go get github.com/kisielk/errcheck
 # echo "errcheck"
@@ -24,4 +24,3 @@ echo "Checking golint..."
 golint -set_exit_status ${PACKAGES}
 
 echo "Success"
-

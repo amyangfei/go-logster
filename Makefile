@@ -1,3 +1,9 @@
+LDFLAGS += -X "github.com/amyangfei/go-logster/logster.ReleaseVersion=$(shell git describe --tags --dirty="-dev")"
+LDFLAGS += -X "github.com/amyangfei/go-logster/logster.BuildTS=$(shell date -u '+%Y-%m-%d %H:%M:%S')"
+LDFLAGS += -X "github.com/amyangfei/go-logster/logster.GitHash=$(shell git rev-parse HEAD)"
+LDFLAGS += -X "github.com/amyangfei/go-logster/logster.GitBranch=$(shell git rev-parse --abbrev-ref HEAD)"
+LDFLAGS += -X "github.com/amyangfei/go-logster/logster.GoVersion=$(shell go version)"
+
 PREFIX		:= /usr/local
 DESTDIR		:= /usr/local
 BINDIR		:= ${PREFIX}/bin
@@ -16,7 +22,7 @@ $(BUILDDIR)/logster: $(wildcard apps/logster/*.go logster/*.go)
 
 $(BUILDDIR)/%:
 	@mkdir -p $(dir $@)
-	$(GOBUILD) ${GOFLAGS} -o $@ ./apps/$*
+	$(GOBUILD) -ldflags '$(LDFLAGS)' -o $@ ./apps/$*
 	@bash ./build_plugins.sh
 
 $(APPS): %: $(BUILDDIR)/%

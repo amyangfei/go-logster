@@ -143,7 +143,7 @@ func main() {
 	args, err := flags.NewParser(&opts, flags.PassDoubleDash|flags.HelpFlag|flags.IgnoreUnknown).ParseArgs(args)
 	if err != nil {
 		if opts.ShowVersion {
-			fmt.Println(logster.Version(binName))
+			fmt.Println(logster.ReleaseInfo(binName))
 			return
 		}
 		fmt.Println(err)
@@ -151,7 +151,7 @@ func main() {
 	}
 
 	if opts.ShowVersion {
-		fmt.Println(logster.Version(binName))
+		fmt.Println(logster.ReleaseInfo(binName))
 		return
 	}
 

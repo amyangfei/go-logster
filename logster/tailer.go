@@ -3,10 +3,11 @@ package logster
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
+
+	"github.com/juju/errors"
 )
 
 // DefaultLogtailPath is the default path to logtail2 binary
@@ -32,16 +33,16 @@ func (tailer *LogtailTailer) CreateStateFile() error {
 	stderrIn, _ := cmd.StderrPipe()
 	stderr := io.MultiWriter(os.Stderr, &stderrBuf)
 	if err := cmd.Start(); err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	go func() {
 		_, errStderr = io.Copy(stderr, stderrIn)
 	}()
 	if err := cmd.Wait(); err != nil {
 		if errStderr != nil {
-			return err
+			return errors.Trace(errStderr)
 		}
-		return fmt.Errorf("%s: %s", err, string(stderrBuf.Bytes()))
+		return errors.Annotatef(err, "create state file error: %s", string(stderrBuf.Bytes()))
 	}
 	return nil
 }
@@ -52,12 +53,12 @@ func (tailer *LogtailTailer) ReadLines(c chan string) error {
 
 	stdout, _ := cmd.StdoutPipe()
 	if err := cmd.Start(); err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	scanner := bufio.NewScanner(stdout)
 	for scanner.Scan() {
 		c <- scanner.Text()
 	}
 	defer close(c)
-	return cmd.Wait()
+	return errors.Trace(cmd.Wait())
 }

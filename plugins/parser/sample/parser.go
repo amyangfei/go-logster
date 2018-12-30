@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"time"
 
 	"github.com/amyangfei/go-logster/logster"
+	"github.com/juju/errors"
 )
 
 // LogReg is a simple http log regex
@@ -38,11 +38,11 @@ func (parser *SampleParser) Init(options string) error {
 func (parser *SampleParser) ParseLine(line string) error {
 	match := LogReg.FindStringSubmatch(line)
 	if len(match) != LogReg.NumSubexp()+1 {
-		return fmt.Errorf("regex failed to match: %s", line)
+		return errors.Errorf("regex failed to match: %s", line)
 	}
 	status, err := strconv.Atoi(match[1])
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	switch {
 	case status < 200:

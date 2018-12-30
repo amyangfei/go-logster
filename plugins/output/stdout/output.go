@@ -5,6 +5,7 @@ import (
 
 	"github.com/amyangfei/go-logster/logster"
 	"github.com/buger/jsonparser"
+	"github.com/juju/errors"
 	"github.com/rs/zerolog"
 )
 
@@ -24,7 +25,7 @@ func (output *StdoutOutput) Init(
 		if dataType == jsonparser.NotExist {
 			output.MetricOp.Separator = DefaultSeparator
 		} else {
-			return err
+			return errors.Trace(err)
 		}
 	} else {
 		output.MetricOp.Separator = string(val)

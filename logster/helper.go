@@ -1,9 +1,9 @@
 package logster
 
 import (
-	"errors"
 	"plugin"
 
+	"github.com/juju/errors"
 	"github.com/rs/zerolog"
 )
 

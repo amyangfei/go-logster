@@ -7,6 +7,7 @@ import (
 	"github.com/amyangfei/go-logster/logster"
 	"github.com/buger/jsonparser"
 	"github.com/imdario/mergo"
+	"github.com/juju/errors"
 )
 
 // DefaultKeySeparator is separator used in combined json key
@@ -28,7 +29,7 @@ func parserKey(options, key, defaultVal string) (string, error) {
 		if dataType == jsonparser.NotExist {
 			return defaultVal, nil
 		}
-		return "", err
+		return "", errors.Trace(err)
 	}
 	return string(val), nil
 }
@@ -37,13 +38,13 @@ func parserKey(options, key, defaultVal string) (string, error) {
 func (parser *JSONParser) Init(options string) error {
 	val, err := parserKey(options, "separator", DefaultKeySeparator)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	parser.KeySeparator = val
 
 	val, err = parserKey(options, "prefix", DefaultPrefix)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	parser.Prefix = val
 
@@ -55,7 +56,7 @@ func (parser *JSONParser) Init(options string) error {
 func (parser *JSONParser) ParseLine(line string) error {
 	var nested map[string]interface{}
 	if err := json.Unmarshal([]byte(line), &nested); err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	mergo.Merge(&parser.Metrics, nested, mergo.WithAppendSlice)
 	return nil
@@ -65,7 +66,7 @@ func (parser *JSONParser) ParseLine(line string) error {
 func (parser *JSONParser) GetState(duration float64) ([]*logster.Metric, error) {
 	flatmap, err := Flatten(parser.Metrics, parser.Prefix, parser.KeySeparator)
 	if err != nil {
-		return nil, err
+		return nil, errors.Trace(err)
 	}
 	now := time.Now().Unix()
 	result := make([]*logster.Metric, 0)

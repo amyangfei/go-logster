@@ -5,11 +5,12 @@ go:
 env:
   - GOARCH=amd64
 
-sudo: false
+sudo: true
 
 go_import_path: github.com/amyangfei/go-logster
 
 before_install:
+  - sudo apt-get install -y logcheck
   - go get github.com/mattn/goveralls
 
 script:

@@ -14,4 +14,4 @@ before_install:
   - go get github.com/mattn/goveralls
 
 script:
-  - env GL_TRAVIS_CI=on ./test.sh
+  - make && env GL_TRAVIS_CI=on env UT_PARSER_PLUGIN_PATH=$(pwd)/build/sample_parser.so UT_OUTPUT_PLUGIN_PATH=$(pwd)/build/stdout_output.so ./test.sh

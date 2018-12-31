@@ -8,9 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/amyangfei/go-logster/logster"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/amyangfei/go-logster/inter"
 )
 
 func CaptureOutput(f func()) string {
@@ -61,11 +62,11 @@ func TestStdoutOutput(t *testing.T) {
 	assert.Nil(t, err)
 
 	inputData := prepareData()
-	metrics := []*logster.Metric{}
+	metrics := []*inter.Metric{}
 	expected := ""
 	for _, line := range inputData {
 		metrics = append(metrics,
-			&logster.Metric{Name: line.name, Value: line.value, Timestamp: line.ts})
+			&inter.Metric{Name: line.name, Value: line.value, Timestamp: line.ts})
 		expected += fmt.Sprintf("%d P-%s-S %v\n", line.ts, line.name, line.value)
 	}
 	capturedOutput := CaptureOutput(func() { output.Submit(metrics) })
@@ -77,11 +78,11 @@ func TestStdoutWithNoOption(t *testing.T) {
 	err := output.Init("P", "", "", false, Logger)
 	assert.Nil(t, err)
 	inputData := prepareData()
-	metrics := []*logster.Metric{}
+	metrics := []*inter.Metric{}
 	expected := ""
 	for _, line := range inputData {
 		metrics = append(metrics,
-			&logster.Metric{Name: line.name, Value: line.value, Timestamp: line.ts})
+			&inter.Metric{Name: line.name, Value: line.value, Timestamp: line.ts})
 		expected += fmt.Sprintf("%d P.%s %v\n", line.ts, line.name, line.value)
 	}
 	capturedOutput := CaptureOutput(func() { output.Submit(metrics) })

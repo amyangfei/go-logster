@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/amyangfei/go-logster/logster"
 	"github.com/buger/jsonparser"
 	"github.com/juju/errors"
 	"github.com/rs/zerolog"
+
+	"github.com/amyangfei/go-logster/inter"
 )
 
 // DefaultSeparator is separator used in metric operation
@@ -14,7 +15,7 @@ const DefaultSeparator = "."
 
 // StdoutOutput sends metrics to stdout
 type StdoutOutput struct {
-	logster.MetricOp
+	inter.MetricOp
 }
 
 // Init inits the *StdoutOutput type Output
@@ -36,7 +37,7 @@ func (output *StdoutOutput) Init(
 }
 
 // Submit send metrics to stdout
-func (output *StdoutOutput) Submit(metrics []*logster.Metric) error {
+func (output *StdoutOutput) Submit(metrics []*inter.Metric) error {
 	for _, metric := range metrics {
 		metricName := output.MetricOp.GetMetricName(metric)
 		fmt.Printf("%d %s %v\n", metric.Timestamp, metricName, metric.Value)

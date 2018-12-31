@@ -5,8 +5,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/amyangfei/go-logster/logster"
 	"github.com/juju/errors"
+
+	"github.com/amyangfei/go-logster/inter"
 )
 
 // LogReg is a simple http log regex
@@ -62,10 +63,10 @@ func (parser *SampleParser) ParseLine(line string) error {
 }
 
 // GetState gets http status metrics from cached parsed result
-func (parser *SampleParser) GetState(duration float64) ([]*logster.Metric, error) {
+func (parser *SampleParser) GetState(duration float64) ([]*inter.Metric, error) {
 	units := "Responses per sec"
 	now := time.Now().Unix()
-	return []*logster.Metric{
+	return []*inter.Metric{
 		{Name: "http_1xx", Value: float64(parser.http1xx) / duration, Units: units, Timestamp: now},
 		{Name: "http_2xx", Value: float64(parser.http2xx) / duration, Units: units, Timestamp: now},
 		{Name: "http_3xx", Value: float64(parser.http3xx) / duration, Units: units, Timestamp: now},

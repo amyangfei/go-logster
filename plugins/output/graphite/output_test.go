@@ -8,9 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/amyangfei/go-logster/logster"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/amyangfei/go-logster/inter"
 )
 
 type TestData struct {
@@ -89,12 +90,12 @@ func TestGraphiteOutput(t *testing.T) {
 	assert.Nil(t, err)
 
 	inputData := prepareData()
-	metrics := []*logster.Metric{}
+	metrics := []*inter.Metric{}
 	expected := make([]string, 0)
 	finCh := make(chan bool)
 	for _, line := range inputData {
 		metrics = append(metrics,
-			&logster.Metric{Name: line.name, Value: line.value, Timestamp: line.ts})
+			&inter.Metric{Name: line.name, Value: line.value, Timestamp: line.ts})
 		expected = append(expected, fmt.Sprintf("P.%s.S %v %d", line.name, line.value, line.ts))
 	}
 	go mockServer(t, len(inputData), finCh, "0.0.0.0:12345", "udp", expected)

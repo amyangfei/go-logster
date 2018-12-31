@@ -5,12 +5,15 @@
 
 PACKAGES=$(go list ./... | grep -vE 'vendor|examples')
 FILES=$(find . -name "*.go" | grep -vE "vendor|examples")
+CURDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 echo "Running tests..."
 if [ "$GL_TRAVIS_CI" = "on" ] ; then
     cover_opts="-covermode=count -coverprofile=coverage.out"
 else
     cover_opts="-cover"
+    export UT_PARSER_PLUGIN_PATH=${CURDIR}/build/sample_parser.so
+    export UT_OUTPUT_PLUGIN_PATH=${CURDIR}/build/stdout_output.so
 fi
 GO111MODULE=on go test -v ${cover_opts} ${PACKAGES}
 

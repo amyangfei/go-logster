@@ -5,10 +5,11 @@ import (
 	"net"
 	"strings"
 
-	"github.com/amyangfei/go-logster/logster"
 	"github.com/buger/jsonparser"
 	"github.com/juju/errors"
 	"github.com/rs/zerolog"
+
+	"github.com/amyangfei/go-logster/inter"
 )
 
 // DefaultSeparator is separator used in metric operation
@@ -16,7 +17,7 @@ const DefaultSeparator = "."
 
 // GraphiteOutput sends metric to graphite
 type GraphiteOutput struct {
-	logster.MetricOp
+	inter.MetricOp
 	Host     string
 	Prototol string
 	DryRun   bool
@@ -62,7 +63,7 @@ func (output *GraphiteOutput) Init(
 }
 
 // Submit sends metrics to graphite
-func (output *GraphiteOutput) Submit(metrics []*logster.Metric) error {
+func (output *GraphiteOutput) Submit(metrics []*inter.Metric) error {
 	var conn net.Conn
 	var err error
 	if !output.DryRun {

@@ -2,9 +2,6 @@ package logster
 
 import (
 	"bufio"
-	"bytes"
-	"io"
-	"os"
 	"os/exec"
 
 	"github.com/juju/errors"
@@ -27,22 +24,9 @@ func (tailer *LogtailTailer) cmd() []string {
 // CreateStateFile creates the state file of LogtailTailer
 func (tailer *LogtailTailer) CreateStateFile() error {
 	cmd := exec.Command(tailer.Binary, tailer.cmd()...)
-
-	var stderrBuf bytes.Buffer
-	var errStderr error
-	stderrIn, _ := cmd.StderrPipe()
-	stderr := io.MultiWriter(os.Stderr, &stderrBuf)
-	if err := cmd.Start(); err != nil {
+	_, err := cmd.CombinedOutput()
+	if err != nil {
 		return errors.Trace(err)
-	}
-	go func() {
-		_, errStderr = io.Copy(stderr, stderrIn)
-	}()
-	if err := cmd.Wait(); err != nil {
-		if errStderr != nil {
-			return errors.Trace(errStderr)
-		}
-		return errors.Annotatef(err, "create state file error: %s", string(stderrBuf.Bytes()))
 	}
 	return nil
 }

@@ -33,8 +33,9 @@ func (tailer *LogtailTailer) CreateStateFile() error {
 
 // ReadLines reads lines via logtail and sends data to the given chan line by line
 func (tailer *LogtailTailer) ReadLines(c chan string) error {
-	cmd := exec.Command(tailer.Binary, tailer.cmd()...)
+	defer close(c)
 
+	cmd := exec.Command(tailer.Binary, tailer.cmd()...)
 	stdout, _ := cmd.StdoutPipe()
 	if err := cmd.Start(); err != nil {
 		return errors.Trace(err)
@@ -43,6 +44,5 @@ func (tailer *LogtailTailer) ReadLines(c chan string) error {
 	for scanner.Scan() {
 		c <- scanner.Text()
 	}
-	defer close(c)
 	return errors.Trace(cmd.Wait())
 }

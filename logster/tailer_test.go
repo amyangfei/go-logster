@@ -83,3 +83,28 @@ func TestReadlines(t *testing.T) {
 		wg.Wait()
 	}
 }
+
+func TestReadLinesError(t *testing.T) {
+	lf, err := ioutil.TempFile("", "fake_tailer.log")
+	assert.Nil(t, err)
+	defer os.Remove(lf.Name())
+
+	tailer := &LogtailTailer{
+		Binary:  "/usr/bin/not_exist_logtail_binary",
+		Logfile: lf.Name(),
+	}
+
+	var wg sync.WaitGroup
+	c := make(chan string)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for line := range c {
+			t.Log(line)
+		}
+	}()
+
+	err = tailer.ReadLines(c)
+	assert.NotNil(t, err)
+	wg.Wait()
+}

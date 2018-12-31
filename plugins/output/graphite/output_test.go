@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/buger/jsonparser"
+	"github.com/juju/errors"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 
@@ -104,4 +106,29 @@ func TestGraphiteOutput(t *testing.T) {
 	err = output.Submit(metrics)
 	assert.Nil(t, err)
 	<-finCh
+}
+
+func TestGraphiteOutputError(t *testing.T) {
+	output := &GraphiteOutput{}
+	var err error
+	err = output.Init(
+		"P", "S", `{"protocol": "udp"}`, false, Logger)
+	assert.Equal(t, jsonparser.KeyPathNotFoundError, errors.Cause(err))
+
+	err = output.Init(
+		"P", "S", `{"host": "127.0.0.1:12345", "protocol":, "udp"}`, false, Logger)
+	assert.Equal(t, jsonparser.UnknownValueTypeError, errors.Cause(err))
+
+	err = output.Init(
+		"P", "S", `{"host": "127.0.0.1:12345", "protocol": "tcp", "separator":,}`, false, Logger)
+	assert.Equal(t, jsonparser.UnknownValueTypeError, errors.Cause(err))
+
+	err = output.Init(
+		"P", "S", `{"host": "127.0.0.1:12345", "protocol": "udp"}`, true, Logger)
+	assert.Nil(t, err)
+	metrics := []*inter.Metric{
+		{Name: "in valid", Value: 1, Timestamp: time.Now().Unix()},
+	}
+	err = output.Submit(metrics)
+	assert.NotNil(t, err)
 }

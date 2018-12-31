@@ -3,17 +3,22 @@ package main
 import (
 	"testing"
 
+	"github.com/buger/jsonparser"
+	"github.com/juju/errors"
 	"github.com/stretchr/testify/assert"
 )
 
-func getJSONParser(options string) *JSONParser {
+func getJSONParser(options string) (*JSONParser, error) {
 	p := &JSONParser{}
-	p.Init(options)
-	return p
+	err := p.Init(options)
+	if err != nil {
+		return nil, errors.Trace(err)
+	}
+	return p, nil
 }
 
 func TestValidJson(t *testing.T) {
-	p := getJSONParser(`{"separator": "$", "prefix": "T"}`)
+	p, _ := getJSONParser(`{"separator": "$", "prefix": "T"}`)
 
 	line := `{"1.1":
 				{"value1": 0,
@@ -42,7 +47,7 @@ func TestValidJson(t *testing.T) {
 }
 
 func TestJsonMerge(t *testing.T) {
-	p := getJSONParser(`{"separator": "."}`)
+	p, _ := getJSONParser(`{"separator": "."}`)
 
 	lines := []string{
 		`{"1.1": {
@@ -87,7 +92,15 @@ func TestJsonMerge(t *testing.T) {
 }
 
 func TestInvalidJson(t *testing.T) {
-	p := getJSONParser("")
+	p, _ := getJSONParser("")
 	err := p.ParseLine(`{"hello": "world"`)
 	assert.NotNil(t, err)
+}
+
+func TestInitError(t *testing.T) {
+	_, err := getJSONParser(`{"separator":, "prefix": T}`)
+	assert.Equal(t, jsonparser.UnknownValueTypeError, errors.Cause(err))
+
+	_, err = getJSONParser(`{"separator": "$", "prefix":,}`)
+	assert.Equal(t, jsonparser.UnknownValueTypeError, errors.Cause(err))
 }

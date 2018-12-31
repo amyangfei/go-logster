@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/amyangfei/go-logster/logster"
@@ -90,27 +91,40 @@ func process(logger zerolog.Logger) {
 	}
 	parser.Init(opts.ParserOptions)
 
+	var wg sync.WaitGroup
 	c := make(chan string)
-	go tailer.ReadLines(c)
-	for line := range c {
-		parser.ParseLine(line)
-	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for line := range c {
+			parser.ParseLine(line)
+		}
+	}()
 
-	if metrics, err := parser.GetState(duration.Seconds()); err != nil {
+	err = tailer.ReadLines(c)
+	if err != nil {
 		logErrorAndExit(logger, err)
-	} else {
-		for _, pluginPath := range opts.Output {
-			output, err := logster.LoadOutputPlugin(pluginPath)
-			if err != nil {
-				logErrorAndExit(logger, err)
-			}
-			if err := output.Init(opts.MetricPrefix, opts.MetricSuffix,
-				opts.OutputOptions, opts.DryRun, logger); err != nil {
-				logErrorAndExit(logger, err)
-			}
-			if err := output.Submit(metrics); err != nil {
-				logErrorAndExit(logger, err)
-			}
+	}
+	wg.Wait()
+
+	metrics, err := parser.GetState(duration.Seconds())
+	if err != nil {
+		logErrorAndExit(logger, err)
+	}
+	for _, pluginPath := range opts.Output {
+		output, err := logster.LoadOutputPlugin(pluginPath)
+		if err != nil {
+			logErrorAndExit(logger, err)
+		}
+
+		err = output.Init(opts.MetricPrefix, opts.MetricSuffix, opts.OutputOptions, opts.DryRun, logger)
+		if err != nil {
+			logErrorAndExit(logger, err)
+		}
+
+		err = output.Submit(metrics)
+		if err != nil {
+			logErrorAndExit(logger, err)
 		}
 	}
 }

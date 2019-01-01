@@ -134,6 +134,11 @@ func TestFlattenError(t *testing.T) {
 
 	gofail.Enable("github.com/amyangfei/go-logster/plugins/parser/json/FlattenError1", `return(false)`)
 	gofail.Enable("github.com/amyangfei/go-logster/plugins/parser/json/FlattenError2", `return(true)`)
+
 	_, err = Flatten(map[string]interface{}{"a": []interface{}{1, 2}}, prefix, separator)
+	assert.Equal(t, ErrorInvalidInput, errors.Cause(err))
+
+	flatmap := make(map[string]interface{})
+	err = flatten(true, flatmap, []interface{}{[]interface{}{1, 2}}, prefix, separator)
 	assert.Equal(t, ErrorInvalidInput, errors.Cause(err))
 }

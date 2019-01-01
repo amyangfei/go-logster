@@ -39,10 +39,6 @@ func FlattenString(nestedstr, prefix, separator string) (string, error) {
 		return "", errors.Trace(err)
 	}
 
-	// gofail: var FlattenStringFlattenError bool
-	// if FlattenStringFlattenError {
-	//   return "", ErrorInvalidInput
-	// }
 	flatmap, err := Flatten(nested, prefix, separator)
 	if err != nil {
 		return "", errors.Trace(err)
@@ -60,9 +56,12 @@ func flatten(top bool, flatMap map[string]interface{}, nested interface{}, prefi
 	assign := func(newKey string, v interface{}) error {
 		switch v.(type) {
 		case map[string]interface{}, []interface{}:
-			if err := flatten(false, flatMap, v, newKey, separator); err != nil {
-				return errors.Trace(err)
-			}
+			// gofail: var FlattenError2 bool
+			// if FlattenError2 {
+			//   v = map[int]int{1:2}
+			// }
+			// return errors.Trace(flatten(false, flatMap, v, newKey, separator))
+			return errors.Trace(flatten(false, flatMap, v, newKey, separator))
 		default:
 			flatMap[newKey] = v
 		}
@@ -70,22 +69,30 @@ func flatten(top bool, flatMap map[string]interface{}, nested interface{}, prefi
 		return nil
 	}
 
-	switch nested.(type) {
-	case map[string]interface{}:
-		for k, v := range nested.(map[string]interface{}) {
-			newKey := enkey(top, prefix, k, separator)
-			assign(newKey, v)
+	dispatch := func(obj interface{}) error {
+		switch nested.(type) {
+		case map[string]interface{}:
+			for k, v := range nested.(map[string]interface{}) {
+				newKey := enkey(top, prefix, k, separator)
+				assign(newKey, v)
+			}
+		case []interface{}:
+			for i, v := range nested.([]interface{}) {
+				newKey := enkey(top, prefix, strconv.Itoa(i), separator)
+				assign(newKey, v)
+			}
+		default:
+			return ErrorInvalidInput
 		}
-	case []interface{}:
-		for i, v := range nested.([]interface{}) {
-			newKey := enkey(top, prefix, strconv.Itoa(i), separator)
-			assign(newKey, v)
-		}
-	default:
-		return ErrorInvalidInput
+		return nil
 	}
 
-	return nil
+	// gofail: var FlattenError1 bool
+	// if FlattenError1 {
+	//   nested = map[int]int{1:2}
+	// }
+	// return errors.Trace(dispatch(nested))
+	return errors.Trace(dispatch(nested))
 }
 
 func enkey(top bool, prefix, subkey, separator string) string {

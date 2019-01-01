@@ -3,6 +3,7 @@ module github.com/amyangfei/go-logster
 require (
 	github.com/buger/jsonparser v0.0.0-20181023193515-52c6e1462ebd
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/etcd-io/gofail v0.0.0-20180808172546-51ce9a71510a
 	github.com/gofrs/flock v0.7.0
 	github.com/imdario/mergo v0.3.6
 	github.com/jessevdk/go-flags v1.4.0

@@ -6,6 +6,10 @@ import (
 	"strings"
 	"testing"
 	"unicode"
+
+	gofail "github.com/etcd-io/gofail/runtime"
+	"github.com/juju/errors"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFlatten(t *testing.T) {
@@ -113,4 +117,16 @@ func TestFlattenString(t *testing.T) {
 			t.Errorf("%d: mismatch, got: %v want: %v", i+1, got, test.want)
 		}
 	}
+}
+
+func TestFlattenError(t *testing.T) {
+	prefix := ""
+	separator := "."
+	_, err := FlattenString(`{"a": "b", "c": }`, prefix, separator)
+	assert.NotNil(t, err)
+
+	gofail.Enable("github.com/amyangfei/go-logster/plugins/parser/json/FlattenStringFlattenError", `return(true)`)
+	defer gofail.Disable("github.com/amyangfei/go-logster/plugins/parser/json")
+	_, err = FlattenString(`{"a": "b"}`, prefix, separator)
+	assert.Equal(t, ErrorInvalidInput, errors.Cause(err))
 }

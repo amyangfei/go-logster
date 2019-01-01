@@ -2,11 +2,17 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"strconv"
+
+	"github.com/juju/errors"
 )
 
 // Refer to: https://github.com/jeremywohl/flatten
+
+var (
+	// ErrorInvalidInput is generic error for invalid json input
+	ErrorInvalidInput = errors.New("Not a valid input: map or slice")
+)
 
 // Flatten generates a flat map from a nested one.
 // The original may include values of type map, slice and scalar, but not struct.
@@ -17,7 +23,7 @@ func Flatten(nested map[string]interface{}, prefix, separator string) (map[strin
 
 	err := flatten(true, flatmap, nested, prefix, separator)
 	if err != nil {
-		return nil, err
+		return nil, errors.Trace(err)
 	}
 
 	return flatmap, nil
@@ -30,17 +36,21 @@ func FlattenString(nestedstr, prefix, separator string) (string, error) {
 	var nested map[string]interface{}
 	err := json.Unmarshal([]byte(nestedstr), &nested)
 	if err != nil {
-		return "", err
+		return "", errors.Trace(err)
 	}
 
+	// gofail: var FlattenStringFlattenError bool
+	// if FlattenStringFlattenError {
+	//   return "", ErrorInvalidInput
+	// }
 	flatmap, err := Flatten(nested, prefix, separator)
 	if err != nil {
-		return "", err
+		return "", errors.Trace(err)
 	}
 
 	flatb, err := json.Marshal(&flatmap)
 	if err != nil {
-		return "", err
+		return "", errors.Trace(err)
 	}
 
 	return string(flatb), nil
@@ -51,7 +61,7 @@ func flatten(top bool, flatMap map[string]interface{}, nested interface{}, prefi
 		switch v.(type) {
 		case map[string]interface{}, []interface{}:
 			if err := flatten(false, flatMap, v, newKey, separator); err != nil {
-				return err
+				return errors.Trace(err)
 			}
 		default:
 			flatMap[newKey] = v
@@ -72,7 +82,7 @@ func flatten(top bool, flatMap map[string]interface{}, nested interface{}, prefi
 			assign(newKey, v)
 		}
 	default:
-		return errors.New("Not a valid input: map or slice")
+		return ErrorInvalidInput
 	}
 
 	return nil

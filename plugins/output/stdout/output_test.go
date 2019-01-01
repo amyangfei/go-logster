@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/buger/jsonparser"
+	"github.com/juju/errors"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 
@@ -87,4 +89,10 @@ func TestStdoutWithNoOption(t *testing.T) {
 	}
 	capturedOutput := CaptureOutput(func() { output.Submit(metrics) })
 	assert.Equal(t, expected, capturedOutput)
+}
+
+func TestStdoutInitError(t *testing.T) {
+	output := &StdoutOutput{}
+	err := output.Init("P", "S", `{"separator":}`, false, Logger)
+	assert.Equal(t, jsonparser.UnknownValueTypeError, errors.Cause(err))
 }

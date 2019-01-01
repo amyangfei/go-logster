@@ -37,8 +37,5 @@ install: $(APPS)
 	install -m 755 -d ${DESTDIR}${BINDIR}
 	for APP in $^ ; do install -m 755 ${BUILDDIR}/$$APP ${DESTDIR}${BINDIR}/$$APP${EXT} ; done
 
-test:
-	$(GOTEST) -cover -race $(PACKAGES)
-
 check:
 	./test.sh

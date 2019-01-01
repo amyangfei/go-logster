@@ -7,14 +7,16 @@ PACKAGES=$(go list ./... | grep -vE 'vendor')
 FILES=$(find . -name "*.go" | grep -vE "vendor")
 CURDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 GOFAIL_DIR=$(for p in $(go list ./...); do echo ${p#"github.com/amyangfei/go-logster/"}; done)
-GOFAIL_ENABLE=$(echo $GOFAIL_DIR | xargs gofail enable)
-GOFAIL_DISABLE=$(echo $GOFAIL_DIR | xargs gofail disable)
 
 echo "Running tests..."
 GO111MODULE=on go get github.com/etcd-io/gofail
+
+# must ensure go-logster soure in GOPATH, because gofail does not support now.
+# ref: https://github.com/etcd-io/gofail/issues/16
 echo $GOFAIL_DIR | xargs gofail enable
 # fix main package in all plugins dir
 sed -i "s/^package .*/package main/g" $(find plugins -name \*.fail.go)
+
 if [ "$GL_TRAVIS_CI" = "on" ] ; then
     cover_opts="-covermode=count -coverprofile=coverage.out"
 else

@@ -74,12 +74,18 @@ func flatten(top bool, flatMap map[string]interface{}, nested interface{}, prefi
 		case map[string]interface{}:
 			for k, v := range nested.(map[string]interface{}) {
 				newKey := enkey(top, prefix, k, separator)
-				assign(newKey, v)
+				err := assign(newKey, v)
+				if err != nil {
+					return errors.Trace(err)
+				}
 			}
 		case []interface{}:
 			for i, v := range nested.([]interface{}) {
 				newKey := enkey(top, prefix, strconv.Itoa(i), separator)
-				assign(newKey, v)
+				err := assign(newKey, v)
+				if err != nil {
+					return errors.Trace(err)
+				}
 			}
 		default:
 			return ErrorInvalidInput

@@ -132,7 +132,8 @@ func TestFlattenError(t *testing.T) {
 	_, err = FlattenString(`{"a": "b"}`, prefix, separator)
 	assert.Equal(t, ErrorInvalidInput, errors.Cause(err))
 
+	gofail.Enable("github.com/amyangfei/go-logster/plugins/parser/json/FlattenError1", `return(false)`)
 	gofail.Enable("github.com/amyangfei/go-logster/plugins/parser/json/FlattenError2", `return(true)`)
-	_, err = FlattenString(`{"a": "b"}`, prefix, separator)
+	_, err = Flatten(map[string]interface{}{"a": []interface{}{1, 2}}, prefix, separator)
 	assert.Equal(t, ErrorInvalidInput, errors.Cause(err))
 }

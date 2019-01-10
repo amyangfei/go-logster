@@ -70,9 +70,9 @@ func flatten(top bool, flatMap map[string]interface{}, nested interface{}, prefi
 	}
 
 	dispatch := func(obj interface{}) error {
-		switch nested.(type) {
+		switch obj.(type) {
 		case map[string]interface{}:
-			for k, v := range nested.(map[string]interface{}) {
+			for k, v := range obj.(map[string]interface{}) {
 				newKey := enkey(top, prefix, k, separator)
 				err := assign(newKey, v)
 				if err != nil {
@@ -80,7 +80,7 @@ func flatten(top bool, flatMap map[string]interface{}, nested interface{}, prefi
 				}
 			}
 		case []interface{}:
-			for i, v := range nested.([]interface{}) {
+			for i, v := range obj.([]interface{}) {
 				newKey := enkey(top, prefix, strconv.Itoa(i), separator)
 				err := assign(newKey, v)
 				if err != nil {

@@ -3,7 +3,6 @@ module github.com/amyangfei/go-logster
 require (
 	github.com/buger/jsonparser v0.0.0-20181023193515-52c6e1462ebd
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/etcd-io/gofail v0.0.0-20180808172546-51ce9a71510a
 	github.com/gofrs/flock v0.7.0
 	github.com/imdario/mergo v0.3.6
 	github.com/jessevdk/go-flags v1.4.0
@@ -11,6 +10,7 @@ require (
 	github.com/juju/loggo v0.0.0-20180524022052-584905176618 // indirect
 	github.com/juju/testing v0.0.0-20180920084828-472a3e8b2073 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/pingcap/gofail v0.0.0-20181217135706-6a951c1e42c3
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/zerolog v1.9.1
 	github.com/stretchr/testify v1.2.2

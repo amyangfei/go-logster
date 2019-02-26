@@ -7,8 +7,8 @@ import (
 	"testing"
 	"unicode"
 
-	gofail "github.com/etcd-io/gofail/runtime"
 	"github.com/juju/errors"
+	gofail "github.com/pingcap/gofail/runtime"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -9,7 +9,7 @@ CURDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 GOFAIL_DIR=$(for p in $(go list ./...); do echo ${p#"github.com/amyangfei/go-logster/"}; done)
 
 echo "Running tests..."
-GO111MODULE=on go get github.com/etcd-io/gofail
+GO111MODULE=on go get github.com/pingcap/gofail
 
 # must ensure go-logster soure in GOPATH, because gofail does not support now.
 # ref: https://github.com/etcd-io/gofail/issues/16
@@ -24,7 +24,8 @@ else
     export UT_PARSER_PLUGIN_PATH=${CURDIR}/build/sample_parser.so
     export UT_OUTPUT_PLUGIN_PATH=${CURDIR}/build/stdout_output.so
 fi
-GO111MODULE=on go test -v ${cover_opts} ${PACKAGES}
+GO111MODULE=on go test -v ${cover_opts} ${PACKAGES} \
+    || { echo $GOFAIL_DIR | xargs gofail disable; exit 1; }
 echo $GOFAIL_DIR | xargs gofail disable
 
 echo "Checking gofmt..."

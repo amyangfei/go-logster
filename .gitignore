@@ -16,3 +16,6 @@ run
 log
 *.log
 vendor
+
+*.lock
+*.state

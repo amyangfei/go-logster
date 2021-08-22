@@ -154,7 +154,7 @@ func main() {
 	args := make([]string, len(os.Args)-1)
 	copy(args, os.Args[1:])
 
-	args, err := flags.NewParser(&opts, flags.PassDoubleDash|flags.HelpFlag|flags.IgnoreUnknown).ParseArgs(args)
+	_, err := flags.NewParser(&opts, flags.PassDoubleDash|flags.HelpFlag|flags.IgnoreUnknown).ParseArgs(args)
 	if err != nil {
 		if opts.ShowVersion {
 			fmt.Println(logster.ReleaseInfo(binName))

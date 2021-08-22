@@ -1,7 +1,9 @@
 module github.com/amyangfei/go-logster
 
+go 1.16
+
 require (
-	github.com/buger/jsonparser v0.0.0-20181023193515-52c6e1462ebd
+	github.com/buger/jsonparser v1.1.1
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gofrs/flock v0.7.0
 	github.com/imdario/mergo v0.3.6
